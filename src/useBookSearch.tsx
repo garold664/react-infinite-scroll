@@ -4,7 +4,7 @@ import axios from 'axios';
 export default function useBookSearch(query: string, pageNumber: number) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState<string[]>([]);
   const [hasMore, setHasMore] = useState(false);
   useEffect(() => {
     setLoading(true);
@@ -21,10 +21,12 @@ export default function useBookSearch(query: string, pageNumber: number) {
       cancelToken: new axios.CancelToken((c) => (cancel = c)),
     })
       .then((res) => {
-        setBooks((prevBooks: string[]) => {
+        setBooks((prevBooks) => {
           return [
-            ...prevBooks,
-            ...res.data.docs.map((b: { title: string }) => b.title),
+            ...new Set([
+              ...prevBooks,
+              ...res.data.docs.map((b: { title: string }) => b.title),
+            ]),
           ];
         });
         console.log(res.data);

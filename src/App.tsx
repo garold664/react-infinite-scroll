@@ -8,6 +8,7 @@ function App() {
   const [pageNumber, setPageNumber] = useState(1);
 
   const books = useBookSearch(query, pageNumber);
+  console.log(books);
 
   function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
     setQuery(event.target.value);
