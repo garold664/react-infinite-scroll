@@ -29,12 +29,17 @@ export default function useBookSearch(query: string, pageNumber: number) {
             ]),
           ];
         });
-        console.log(res.data);
+        setHasMore(res.data.docs.length > 0);
+        setLoading(false);
       })
       .catch((e) => {
         if (axios.isCancel(e)) return;
+        setError(true);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, [query, pageNumber]);
 
-  return books;
+  return { books, loading, error, hasMore };
 }

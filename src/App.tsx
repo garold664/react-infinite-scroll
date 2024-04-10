@@ -7,8 +7,7 @@ function App() {
   const [query, setQuery] = useState('');
   const [pageNumber, setPageNumber] = useState(1);
 
-  const books = useBookSearch(query, pageNumber);
-  console.log(books);
+  const { books, loading, error, hasMore } = useBookSearch(query, pageNumber);
 
   function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
     setQuery(event.target.value);
@@ -20,14 +19,9 @@ function App() {
   return (
     <>
       <input type="text" onChange={handleSearch} />
-      {booksList}
-      {/* <div>Title</div>
-      <div>Title</div>
-      <div>Title</div>
-      <div>Title</div>
-      <div>Title</div>
-      <div>Loading</div>
-      <div>Error</div> */}
+      {loading && <div>Loading...</div>}
+      {error && <div>Error</div>}
+      {booksList.length > 0 && booksList}
     </>
   );
 }
