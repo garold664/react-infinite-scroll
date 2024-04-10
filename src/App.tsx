@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 import './App.css';
 import useBookSearch from './useBookSearch';
+import { DotLoader } from 'react-spinners';
 
 function App() {
   const [query, setQuery] = useState('');
@@ -34,21 +35,29 @@ function App() {
   const booksList = books.map((book, index) => {
     if (books.length === index + 1) {
       return (
-        <div ref={lastBookElementRef} key={book}>
+        <div ref={lastBookElementRef} key={book} className="book-title">
           {book}
         </div>
       );
     } else {
-      return <div key={book}>{book}</div>;
+      return (
+        <div key={book} className="book-title">
+          {book}
+        </div>
+      );
     }
   });
 
   return (
     <>
-      <input type="text" onChange={handleSearch} />
+      <input type="text" onChange={handleSearch} className="search" />
       {booksList.length > 0 && booksList}
-      {loading && <div>Loading...</div>}
-      {error && <div>Error</div>}
+      {loading && (
+        <div className="spinner">
+          <DotLoader color="darkblue" />
+        </div>
+      )}
+      {error && <div className="error">Error</div>}
     </>
   );
 }
