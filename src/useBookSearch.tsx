@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import axios, { Canceler } from 'axios';
 
 const CancelToken = axios.CancelToken;
 const source = CancelToken.source();
@@ -15,11 +15,12 @@ export default function useBookSearch(query: string, pageNumber: number) {
   }, [query]);
 
   let timerId = useRef<null | number>(null);
+  let cancel: Canceler;
   useEffect(() => {
     if (typeof timerId.current === 'number') {
       clearTimeout(timerId.current);
     }
-    let cancel;
+
     timerId.current = setTimeout(() => {
       setLoading(true);
       setError(false);
@@ -57,6 +58,11 @@ export default function useBookSearch(query: string, pageNumber: number) {
           setLoading(false);
         });
     }, 500);
+    return () => {
+      if (cancel) {
+        cancel();
+      }
+    };
   }, [query, pageNumber]);
 
   return { books, loading, error, hasMore };
