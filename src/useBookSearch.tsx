@@ -6,7 +6,7 @@ const source = CancelToken.source();
 
 export default function useBookSearch(query: string, pageNumber: number) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [books, setBooks] = useState<string[]>([]);
   const [hasMore, setHasMore] = useState(false);
 
@@ -23,7 +23,7 @@ export default function useBookSearch(query: string, pageNumber: number) {
 
     timerId.current = setTimeout(() => {
       setLoading(true);
-      setError(false);
+      setErrorMessage('');
       console.log('start loading');
       axios({
         method: 'GET',
@@ -49,10 +49,11 @@ export default function useBookSearch(query: string, pageNumber: number) {
 
           setHasMore(res.data.docs.length > 0);
           setLoading(false);
+          // console.log(res.data);
         })
         .catch((e) => {
           if (axios.isCancel(e)) return;
-          setError(true);
+          setErrorMessage(e.message);
         })
         .finally(() => {
           setLoading(false);
@@ -65,5 +66,5 @@ export default function useBookSearch(query: string, pageNumber: number) {
     };
   }, [query, pageNumber]);
 
-  return { books, loading, error, hasMore };
+  return { books, loading, errorMessage, hasMore };
 }

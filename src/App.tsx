@@ -3,12 +3,16 @@ import { useState, useRef, useCallback } from 'react';
 import './App.css';
 import useBookSearch from './useBookSearch';
 import { DotLoader } from 'react-spinners';
+import ErrorMessage from './ErrorMessage';
 
 function App() {
   const [query, setQuery] = useState('');
   const [pageNumber, setPageNumber] = useState(1);
 
-  const { books, loading, error, hasMore } = useBookSearch(query, pageNumber);
+  const { books, loading, errorMessage, hasMore } = useBookSearch(
+    query,
+    pageNumber
+  );
 
   const observer = useRef<IntersectionObserver>();
   const lastBookElementRef = useCallback(
@@ -57,7 +61,7 @@ function App() {
           <DotLoader color="darkblue" />
         </div>
       )}
-      {error && <div className="error">Error</div>}
+      {errorMessage && <ErrorMessage error={errorMessage} />}
     </>
   );
 }
