@@ -51,6 +51,7 @@ function App() {
     <>
       <input type="text" onChange={handleSearch} className="search" />
       {booksList.length > 0 && booksList}
+
       {loading && (
         <div className="spinner">
           <DotLoader color="darkblue" />
