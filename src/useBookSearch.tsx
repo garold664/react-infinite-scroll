@@ -1,5 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+
+const CancelToken = axios.CancelToken;
+const source = CancelToken.source();
 
 export default function useBookSearch(query: string, pageNumber: number) {
   const [loading, setLoading] = useState(false);
@@ -10,39 +13,50 @@ export default function useBookSearch(query: string, pageNumber: number) {
   useEffect(() => {
     setBooks([]);
   }, [query]);
-  useEffect(() => {
-    setLoading(true);
-    setError(false);
 
+  let timerId = useRef<null | number>(null);
+  useEffect(() => {
+    if (typeof timerId.current === 'number') {
+      clearTimeout(timerId.current);
+    }
     let cancel;
-    axios({
-      method: 'GET',
-      url: `https://openlibrary.org/search.json`,
-      params: {
-        q: query,
-        page: pageNumber,
-      },
-      cancelToken: new axios.CancelToken((c) => (cancel = c)),
-    })
-      .then((res) => {
-        setBooks((prevBooks) => {
-          return [
-            ...new Set([
-              ...prevBooks,
-              ...res.data.docs.map((b: { title: string }) => b.title),
-            ]),
-          ];
+    timerId.current = setTimeout(() => {
+      setLoading(true);
+      setError(false);
+      console.log('start loading');
+      axios({
+        method: 'GET',
+        url: `https://openlibrary.org/search.json`,
+        params: {
+          q: query,
+          page: pageNumber,
+        },
+        cancelToken: new axios.CancelToken((c) => (cancel = c)),
+      })
+        .then((res) => {
+          if (query === '') {
+            return;
+          }
+          setBooks((prevBooks) => {
+            return [
+              ...new Set([
+                ...prevBooks,
+                ...res.data.docs.map((b: { title: string }) => b.title),
+              ]),
+            ];
+          });
+
+          setHasMore(res.data.docs.length > 0);
+          setLoading(false);
+        })
+        .catch((e) => {
+          if (axios.isCancel(e)) return;
+          setError(true);
+        })
+        .finally(() => {
+          setLoading(false);
         });
-        setHasMore(res.data.docs.length > 0);
-        setLoading(false);
-      })
-      .catch((e) => {
-        if (axios.isCancel(e)) return;
-        setError(true);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    }, 500);
   }, [query, pageNumber]);
 
   return { books, loading, error, hasMore };

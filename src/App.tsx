@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 
 import './App.css';
 import useBookSearch from './useBookSearch';
@@ -17,17 +17,16 @@ function App() {
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          console.log('Visibel');
           setPageNumber((prevPageNumber) => prevPageNumber + 1);
         }
       });
-      console.log(node);
       if (node) observer.current.observe(node);
     },
     [loading, hasMore]
   );
 
   function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
+    // if (event.target.value.length === 0) return;
     setQuery(event.target.value);
     setPageNumber(1);
   }
